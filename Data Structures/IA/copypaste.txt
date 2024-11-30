@@ -1,0 +1,253 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+static int indexGenerator = 0;
+static int totalUsers = 0;
+
+map<string, int> nameToIndex;
+map<int, string> indexToName;
+
+vector<vector<pair<int, double>>> adj(100);
+
+void addEdge(int u, int v, double w) {
+    bool edgeFound = false;
+    for (auto &edge : adj[u]) {
+        if (edge.first == v) {
+            edge.second += w;
+            edgeFound = true;
+            break;
+        }
+    }
+    if (!edgeFound) {
+        adj[u].push_back(make_pair(v, w));
+    }
+
+    bool edgeFound2 = false;
+    for (auto &edge : adj[v]) {
+        if (edge.first == u) {
+            edge.second -= w;
+            edgeFound2 = true;
+            break;
+        }
+    }
+    if (!edgeFound2) {
+        adj[v].push_back(make_pair(u, -w));
+    }
+}
+
+vector<pair<int, double>> returnWeightsOfAdjacentNodes(int index) {
+    vector<pair<int, double>> balancesOwed;
+    for (const auto &edge : adj[index]) {
+        balancesOwed.push_back(edge);        
+    }
+    return balancesOwed;
+}
+
+void addUser(string name) {
+    if (nameToIndex.find(name) != nameToIndex.end()) {
+        cout << "User already exists!" << endl;
+        return;
+    }
+    int index = indexGenerator++;
+    nameToIndex[name] = index;
+    indexToName[index] = name;
+    totalUsers++;
+    cout << "User " << name << " added successfully!" << endl;
+}
+
+void showUsers() {
+    if (totalUsers == 0) {
+        cout << "No users found!" << endl;
+        return;
+    }
+    cout << "Current users:\n";
+    for (const auto &it : nameToIndex) {
+        cout << it.first << " (ID: " << it.second << ")" << endl;
+    }
+}
+
+void deleteUser(string name) {
+    if (nameToIndex.find(name) == nameToIndex.end()) {
+        cout << "User not found!" << endl;
+        return;
+    }
+
+    int userIndex = nameToIndex[name];
+    
+    adj[userIndex].clear();
+    for (int i = 0; i < totalUsers; ++i) {
+        for (auto it = adj[i].begin(); it != adj[i].end(); ) {
+            if (it->first == userIndex) {
+                it = adj[i].erase(it);
+            } else {
+                ++it;
+            }
+        }
+    }
+
+    nameToIndex.erase(name);
+    indexToName.erase(userIndex);
+    totalUsers--;
+
+    cout << "User " << name << " deleted successfully!" << endl;
+}
+
+void addExpense(string addedBy, double moneyPaid) {
+    if (totalUsers == 0) {
+        cout << "No users available to add expenses." << endl;
+        return;
+    }
+    
+    double share = moneyPaid / totalUsers;
+    int userIndex = nameToIndex[addedBy];
+    for (int i = 0; i < totalUsers; i++) {
+        if (i != userIndex) {
+            addEdge(userIndex, i, share);
+        }
+    }
+    cout << "Expense added successfully!" << endl;
+}
+
+void showBalanceByUser(string user) {
+    bool abc = true;
+    int userIndex = nameToIndex[user];
+    vector<pair<int, double>> balances = returnWeightsOfAdjacentNodes(userIndex);
+
+    for (const auto &balance : balances) {
+        int sentToIndex = balance.first;
+        double bal = balance.second;
+        bool borrowed = (bal < 0);
+        bal = abs(bal); 
+
+        if (bal != 0) {
+            abc = false;
+            string userNameSentTo = indexToName[sentToIndex];
+            cout << fixed << setprecision(2);
+            cout << user << " " << (borrowed ? "has to give" : "has to take") << " " << bal << " from " << userNameSentTo << endl;
+        }
+    }
+    if(abc) {
+        cout << "No dues remaining" << endl;
+    }
+}
+
+void showGraph() {
+    if (totalUsers == 0) {
+        cout << "No users to display in the graph!" << endl;
+        return;
+    }
+    cout << "Graph (User Relationships):\n";
+    for (int i = 0; i < totalUsers; i++) {
+        cout << indexToName[i] << " owes: ";
+        for (const auto &edge : adj[i]) {
+            int destIndex = edge.first;
+            double amount = edge.second;
+            if (amount != 0) {
+                cout << indexToName[destIndex] << " Rs." << fixed << setprecision(2) << abs(amount) << ", ";
+            }
+        }
+        cout << endl;
+    }
+}
+
+void paidExpense(string user, string returnedTo, double moneyReturned){
+    int userIndex = nameToIndex[user];
+    int returnToIndex = nameToIndex[returnedTo];
+    addEdge(userIndex, returnToIndex, -moneyReturned);
+}
+
+
+void makePayment(string payer, string receiver, double amount) {
+    int payerIndex = nameToIndex[payer];
+    int receiverIndex = nameToIndex[receiver];
+    bool paymentMade = false;
+    
+    paidExpense(payer, receiver, -amount);
+    cout << "Payment of Rs." << fixed << setprecision(2) << amount << " from " << payer << " to " << receiver << " made successfully!" << endl;
+}
+
+int main() {
+    
+    bool flag = true;
+
+    while (flag) {
+        cout << "====================================================================================================================== " << endl;
+        cout << "oooooooooo.        .o.       ooooo              .o.       ooooo      ooo   .oooooo.   ooooo oooooooooooo oooooo   oooo " << endl;
+        cout << "`888'   `Y8b      .888.      `888'             .888.      `888b.     `8'  d8P'  `Y8b  `888' `888'         `888.   .8'  " << endl;
+        cout << " 888     888     .8 888.      888             .8 888.      8 `88b.    8  888           888   888           `888. .8'   " << endl;
+        cout << " 888oooo888'    .8' `888.     888            .8' `888.     8   `88b.  8  888           888   888oooo8       `888.8'    " << endl;
+        cout << " 888    `88b   .88ooo8888.    888           .88ooo8888.    8     `88b.8  888           888   888             `888'     " << endl;
+        cout << " 888    .88P  .8'     `888.   888       o  .8'     `888.   8       `888  `88b    ooo   888   888              888      " << endl;
+        cout << "o888bood8P'  o88o     o8888o o888ooooood8 o88o     o8888o o8o        `8   `Y8bood8P'  o888o o888o            o888o     " << endl;
+        cout << "====================================================================================================================== " << endl;
+
+        cout << "\nMenu:\n"
+             << "1. Add User\n"
+             << "2. Show Users\n"
+             << "3. Delete User\n"
+             << "4. Add Expense\n"
+             << "5. Show Balance\n"
+             << "6. Show Graph\n"
+             << "7. Make Payment\n"
+             << "8. Exit\n";
+        
+        int choice;
+        cin >> choice;
+        string name, addedBy, user, payer, receiver;
+        double moneyPaid, amount;
+
+        switch (choice) {
+            case 1:
+                cout << "Enter name of user to add: ";
+                cin >> name;
+                addUser(name);
+                break;
+            case 2:
+                showUsers();
+                break;
+            case 3:
+                cout << "Enter name of user to delete: ";
+                cin >> name;
+                deleteUser(name);
+                break;
+            case 4:
+                cout << "Enter name of user who paid: ";
+                cin >> addedBy;
+                cout << "Enter amount paid: ";
+                cin >> moneyPaid;
+                addExpense(addedBy, moneyPaid);
+                break;
+            case 5:
+                cout << "Enter name of user to show balance: ";
+                cin >> user;
+                showBalanceByUser(user);
+                break;
+            case 6:
+                showGraph();
+                break;
+            case 7:
+                cout << "Enter payer's name: ";
+                cin >> payer;
+                cout << "Enter receiver's name: ";
+                cin >> receiver;
+                cout << "Enter amount to pay: ";
+                cin >> amount;
+                makePayment(payer, receiver, amount);
+                break;
+            case 8:
+                flag = false;
+                cout << "Thank You" << endl;
+                break;
+            default:
+                cout << "Invalid choice!" << endl;
+                break;
+        }
+
+        system("pause");
+        system("CLS");
+        
+        
+    }
+
+    return 0;
+}

@@ -1,0 +1,5 @@
+a
+abcd
+TECH
+software
+This is demo for writing contents to a fileI have modified the contents of this file
