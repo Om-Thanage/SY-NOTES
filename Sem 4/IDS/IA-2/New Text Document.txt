@@ -1,0 +1,560 @@
+> data(women)
+> print(women)
+   height weight
+1      58    115
+2      59    117
+3      60    120
+4      61    123
+5      62    126
+6      63    129
+7      64    132
+8      65    135
+9      66    139
+10     67    142
+11     68    146
+12     69    150
+13     70    154
+14     71    159
+15     72    164
+> 
+> women_with_na <- women
+> set.seed(123)  # For reproducibility
+> women_with_na[sample(1:nrow(women_with_na), 5), "height"] <- NA
+> women_with_na[sample(1:nrow(women_with_na), 3), "weight"] <- NA
+> print(women_with_na)
+   height weight
+1      58    115
+2      NA    117
+3      NA    120
+4      61    123
+5      62     NA
+6      63     NA
+7      64    132
+8      65    135
+9      66    139
+10     NA    142
+11     68     NA
+12     69    150
+13     70    154
+14     NA    159
+15     NA    164
+> length(which(is.na(women_with_na)))
+[1] 8
+> missing_rows <- !complete.cases(women_with_na)
+> women_with_na[missing_rows, ]
+   height weight
+2      NA    117
+3      NA    120
+5      62     NA
+6      63     NA
+10     NA    142
+11     68     NA
+14     NA    159
+15     NA    164
+> complete.cases(women_with_na)
+ [1]  TRUE FALSE FALSE  TRUE FALSE FALSE  TRUE  TRUE  TRUE FALSE FALSE  TRUE  TRUE FALSE FALSE
+> women_clean <- women_with_na[complete.cases(women_with_na), ]
+> print(women_clean)
+   height weight
+1      58    115
+4      61    123
+7      64    132
+8      65    135
+9      66    139
+12     69    150
+13     70    154
+> length(which(is.na(women_with_na)))
+[1] 8
+> length(which(is.na(women_clean)))
+[1] 0
+> women_new <- women_with_na
+> 
+> women_new$height[is.na(women_new$height)] <- median(women_new$height, na.rm = TRUE)
+> 
+> women_new$weight[is.na(women_new$weight)] <- mean(women_new$weight, na.rm = TRUE)
+> 
+> length(which(is.na(women_new)))
+[1] 0
+> print(women_new)
+   height weight
+1    58.0  115.0
+2    64.5  117.0
+3    64.5  120.0
+4    61.0  123.0
+5    62.0  137.5
+6    63.0  137.5
+7    64.0  132.0
+8    65.0  135.0
+9    66.0  139.0
+10   64.5  142.0
+11   68.0  137.5
+12   69.0  150.0
+13   70.0  154.0
+14   64.5  159.0
+15   64.5  164.0
+> boxplot(women$height, main="Boxplot of Height", ylab="Height (in)")
+> boxplot(women$weight, main="Boxplot of Weight", ylab="Weight (lbs)")
+> 
+> Q1_h <- quantile(women$height, 0.25)
+> Q3_h <- quantile(women$height, 0.75)
+> IQR_h <- Q3_h - Q1_h
+> min_h <- Q1_h - 1.5 * IQR_h
+> max_h <- Q3_h + 1.5 * IQR_h
+> 
+> h_outliers <- which(women$height < min_h | women$height > max_h)
+> cat("Height outliers at indices:", h_outliers, "\n")
+Height outliers at indices:  
+> 
+> Q1_w <- quantile(women$weight, 0.25)
+> Q3_w <- quantile(women$weight, 0.75)
+> IQR_w <- Q3_w - Q1_w
+> min_w <- Q1_w - 1.5 * IQR_w
+> max_w <- Q3_w + 1.5 * IQR_w
+> 
+> w_outliers <- which(women$weight < min_w | women$weight > max_w)
+> cat("Weight outliers at indices:", w_outliers, "\n")
+Weight outliers at indices:  
+> 
+> plot(women$height, women$weight, 
++      main = "Scatter Plot of Height vs Weight", 
++      xlab = "Height (in)", 
++      ylab = "Weight (lbs)",
++      col = ifelse(1:nrow(women) %in% c(h_outliers, w_outliers), "red", "black"),
++      pch = 16)
+> women_cat <- women
+> women_cat$height_category <- cut(women$height, 
++                                  breaks = c(0, 62, 66, 72), 
++                                  labels = c("short", "medium", "tall"))
+> print(head(women_cat))
+  height weight height_category
+1     58    115           short
+2     59    117           short
+3     60    120           short
+4     61    123           short
+5     62    126           short
+6     63    129          medium
+> print(women_cat)
+   height weight height_category
+1      58    115           short
+2      59    117           short
+3      60    120           short
+4      61    123           short
+5      62    126           short
+6      63    129          medium
+7      64    132          medium
+8      65    135          medium
+9      66    139          medium
+10     67    142            tall
+11     68    146            tall
+12     69    150            tall
+13     70    154            tall
+14     71    159            tall
+15     72    164            tall
+> women_cat <- women
+> women_cat$weight_category <- cut(women$weight, 
++                                  breaks = c(0, 125, 140, 164), 
++                                  labels = c("thin", "medium", "fat"))
+> print(women_cat)
+   height weight weight_category
+1      58    115            thin
+2      59    117            thin
+3      60    120            thin
+4      61    123            thin
+5      62    126          medium
+6      63    129          medium
+7      64    132          medium
+8      65    135          medium
+9      66    139          medium
+10     67    142             fat
+11     68    146             fat
+12     69    150             fat
+13     70    154             fat
+14     71    159             fat
+15     72    164             fat
+> women_cat <- women
+> women_cat$height_category <- cut(women$height, 
++                                  breaks = c(0, 62, 66, 72), 
++                                  labels = c("short", "medium", "tall"))
+> women_cat$weight_category <- cut(women$weight, 
++                                  breaks = c(0, 125, 140, 164), 
++                                  labels = c("thin", "medium", "fat"))
+> print(women_cat)
+   height weight height_category weight_category
+1      58    115           short            thin
+2      59    117           short            thin
+3      60    120           short            thin
+4      61    123           short            thin
+5      62    126           short          medium
+6      63    129          medium          medium
+7      64    132          medium          medium
+8      65    135          medium          medium
+9      66    139          medium          medium
+10     67    142            tall             fat
+11     68    146            tall             fat
+12     69    150            tall             fat
+13     70    154            tall             fat
+14     71    159            tall             fat
+15     72    164            tall             fat
+> 
+> boxplot(women$height, main="Boxplot of Height", ylab="Height (in)")
+> boxplot(women$weight, main="Boxplot of Weight", ylab="Weight (lbs)")
+> one_hot_women <- model.matrix(~height_categroy + weight_category -1, data = women_cat)
+Error in eval(predvars, data, env) : object 'height_categroy' not found
+> women_cat
+   height weight height_category weight_category
+1      58    115           short            thin
+2      59    117           short            thin
+3      60    120           short            thin
+4      61    123           short            thin
+5      62    126           short          medium
+6      63    129          medium          medium
+7      64    132          medium          medium
+8      65    135          medium          medium
+9      66    139          medium          medium
+10     67    142            tall             fat
+11     68    146            tall             fat
+12     69    150            tall             fat
+13     70    154            tall             fat
+14     71    159            tall             fat
+15     72    164            tall             fat
+> one_hot_women <- model.matrix(~height_category + weight_category -1, data = women_cat)
+> one_hot_women
+   height_categoryshort height_categorymedium height_categorytall weight_categorymedium weight_categoryfat
+1                     1                     0                   0                     0                  0
+2                     1                     0                   0                     0                  0
+3                     1                     0                   0                     0                  0
+4                     1                     0                   0                     0                  0
+5                     1                     0                   0                     1                  0
+6                     0                     1                   0                     1                  0
+7                     0                     1                   0                     1                  0
+8                     0                     1                   0                     1                  0
+9                     0                     1                   0                     1                  0
+10                    0                     0                   1                     0                  1
+11                    0                     0                   1                     0                  1
+12                    0                     0                   1                     0                  1
+13                    0                     0                   1                     0                  1
+14                    0                     0                   1                     0                  1
+15                    0                     0                   1                     0                  1
+attr(,"assign")
+[1] 1 1 1 2 2
+attr(,"contrasts")
+attr(,"contrasts")$height_category
+[1] "contr.treatment"
+
+attr(,"contrasts")$weight_category
+[1] "contr.treatment"
+
+> one_hot_women_df = as.data.frame(one_hot_women)
+> one_hot_women_df
+   height_categoryshort height_categorymedium height_categorytall weight_categorymedium weight_categoryfat
+1                     1                     0                   0                     0                  0
+2                     1                     0                   0                     0                  0
+3                     1                     0                   0                     0                  0
+4                     1                     0                   0                     0                  0
+5                     1                     0                   0                     1                  0
+6                     0                     1                   0                     1                  0
+7                     0                     1                   0                     1                  0
+8                     0                     1                   0                     1                  0
+9                     0                     1                   0                     1                  0
+10                    0                     0                   1                     0                  1
+11                    0                     0                   1                     0                  1
+12                    0                     0                   1                     0                  1
+13                    0                     0                   1                     0                  1
+14                    0                     0                   1                     0                  1
+15                    0                     0                   1                     0                  1
+> women_cat <- women
+> women_cat$height_category <- cut(women$height, 
++                                    +                                  breaks = c(0, 62, 66, 72), 
+Error: unexpected '=' in:
+"women_cat$height_category <- cut(women$height, 
+                                   +                                  breaks ="
+> women_cat <- women
+> women_cat$height_category <- cut(women$height, 
++                                     breaks = c(0, 62, 66, 72), 
++                                     labels = c("short", "medium", "tall"))
+> women_cat$weight_category <- cut(women$weight, 
++                                     breaks = c(0, 125, 140, 164), 
++                                     labels = c("thin", "medium", "fat"))
+> one_hot_women <- model.matrix(~height_category + weight_category -1, data = women_cat)
+> one_hot_women
+   height_categoryshort height_categorymedium height_categorytall weight_categorymedium weight_categoryfat
+1                     1                     0                   0                     0                  0
+2                     1                     0                   0                     0                  0
+3                     1                     0                   0                     0                  0
+4                     1                     0                   0                     0                  0
+5                     1                     0                   0                     1                  0
+6                     0                     1                   0                     1                  0
+7                     0                     1                   0                     1                  0
+8                     0                     1                   0                     1                  0
+9                     0                     1                   0                     1                  0
+10                    0                     0                   1                     0                  1
+11                    0                     0                   1                     0                  1
+12                    0                     0                   1                     0                  1
+13                    0                     0                   1                     0                  1
+14                    0                     0                   1                     0                  1
+15                    0                     0                   1                     0                  1
+attr(,"assign")
+[1] 1 1 1 2 2
+attr(,"contrasts")
+attr(,"contrasts")$height_category
+[1] "contr.treatment"
+
+attr(,"contrasts")$weight_category
+[1] "contr.treatment"
+
+> install.packages("caret")
+WARNING: Rtools is required to build R packages but is not currently installed. Please download and install the appropriate version of Rtools before proceeding:
+
+https://cran.rstudio.com/bin/windows/Rtools/
+Installing package into ‘C:/Users/omsth/AppData/Local/R/win-library/4.4’
+(as ‘lib’ is unspecified)
+also installing the dependencies ‘listenv’, ‘parallelly’, ‘future’, ‘globals’, ‘shape’, ‘future.apply’, ‘progressr’, ‘SQUAREM’, ‘cpp11’, ‘diagram’, ‘lava’, ‘tzdb’, ‘prodlim’, ‘timechange’, ‘proxy’, ‘iterators’, ‘data.table’, ‘clock’, ‘gower’, ‘hardhat’, ‘ipred’, ‘lubridate’, ‘sparsevctrs’, ‘e1071’, ‘foreach’, ‘ModelMetrics’, ‘plyr’, ‘pROC’, ‘recipes’, ‘reshape2’
+
+
+  There is a binary version available but the source version is later:
+     binary source needs_compilation
+tzdb  0.4.0  0.5.0              TRUE
+
+  Binaries will be installed
+trying URL 'https://cran.rstudio.com/bin/windows/contrib/4.4/listenv_0.9.1.zip'
+Content type 'application/zip' length 109923 bytes (107 KB)
+downloaded 107 KB
+
+trying URL 'https://cran.rstudio.com/bin/windows/contrib/4.4/parallelly_1.42.0.zip'
+Content type 'application/zip' length 568904 bytes (555 KB)
+downloaded 555 KB
+
+trying URL 'https://cran.rstudio.com/bin/windows/contrib/4.4/future_1.34.0.zip'
+Content type 'application/zip' length 693182 bytes (676 KB)
+downloaded 676 KB
+
+trying URL 'https://cran.rstudio.com/bin/windows/contrib/4.4/globals_0.16.3.zip'
+Content type 'application/zip' length 109926 bytes (107 KB)
+downloaded 107 KB
+
+trying URL 'https://cran.rstudio.com/bin/windows/contrib/4.4/shape_1.4.6.1.zip'
+Content type 'application/zip' length 753988 bytes (736 KB)
+downloaded 736 KB
+
+trying URL 'https://cran.rstudio.com/bin/windows/contrib/4.4/future.apply_1.11.3.zip'
+Content type 'application/zip' length 160653 bytes (156 KB)
+downloaded 156 KB
+
+trying URL 'https://cran.rstudio.com/bin/windows/contrib/4.4/progressr_0.15.1.zip'
+Content type 'application/zip' length 404006 bytes (394 KB)
+downloaded 394 KB
+
+trying URL 'https://cran.rstudio.com/bin/windows/contrib/4.4/SQUAREM_2021.1.zip'
+Content type 'application/zip' length 183502 bytes (179 KB)
+downloaded 179 KB
+
+trying URL 'https://cran.rstudio.com/bin/windows/contrib/4.4/cpp11_0.5.2.zip'
+Content type 'application/zip' length 310653 bytes (303 KB)
+downloaded 303 KB
+
+trying URL 'https://cran.rstudio.com/bin/windows/contrib/4.4/diagram_1.6.5.zip'
+Content type 'application/zip' length 688009 bytes (671 KB)
+downloaded 671 KB
+
+trying URL 'https://cran.rstudio.com/bin/windows/contrib/4.4/lava_1.8.1.zip'
+Content type 'application/zip' length 2515236 bytes (2.4 MB)
+downloaded 2.4 MB
+
+trying URL 'https://cran.rstudio.com/bin/windows/contrib/4.4/tzdb_0.4.0.zip'
+Content type 'application/zip' length 1016727 bytes (992 KB)
+downloaded 992 KB
+
+trying URL 'https://cran.rstudio.com/bin/windows/contrib/4.4/prodlim_2024.06.25.zip'
+Content type 'application/zip' length 424876 bytes (414 KB)
+downloaded 414 KB
+
+trying URL 'https://cran.rstudio.com/bin/windows/contrib/4.4/timechange_0.3.0.zip'
+Content type 'application/zip' length 516655 bytes (504 KB)
+downloaded 504 KB
+
+trying URL 'https://cran.rstudio.com/bin/windows/contrib/4.4/proxy_0.4-27.zip'
+Content type 'application/zip' length 181327 bytes (177 KB)
+downloaded 177 KB
+
+trying URL 'https://cran.rstudio.com/bin/windows/contrib/4.4/iterators_1.0.14.zip'
+Content type 'application/zip' length 353697 bytes (345 KB)
+downloaded 345 KB
+
+trying URL 'https://cran.rstudio.com/bin/windows/contrib/4.4/data.table_1.17.0.zip'
+Content type 'application/zip' length 2910283 bytes (2.8 MB)
+downloaded 2.8 MB
+
+trying URL 'https://cran.rstudio.com/bin/windows/contrib/4.4/clock_0.7.2.zip'
+Content type 'application/zip' length 2227344 bytes (2.1 MB)
+downloaded 2.1 MB
+
+trying URL 'https://cran.rstudio.com/bin/windows/contrib/4.4/gower_1.0.2.zip'
+Content type 'application/zip' length 326588 bytes (318 KB)
+downloaded 318 KB
+
+trying URL 'https://cran.rstudio.com/bin/windows/contrib/4.4/hardhat_1.4.1.zip'
+Content type 'application/zip' length 875729 bytes (855 KB)
+downloaded 855 KB
+
+trying URL 'https://cran.rstudio.com/bin/windows/contrib/4.4/ipred_0.9-15.zip'
+Content type 'application/zip' length 393300 bytes (384 KB)
+downloaded 384 KB
+
+trying URL 'https://cran.rstudio.com/bin/windows/contrib/4.4/lubridate_1.9.4.zip'
+Content type 'application/zip' length 990563 bytes (967 KB)
+downloaded 967 KB
+
+trying URL 'https://cran.rstudio.com/bin/windows/contrib/4.4/sparsevctrs_0.3.0.zip'
+Content type 'application/zip' length 204369 bytes (199 KB)
+downloaded 199 KB
+
+trying URL 'https://cran.rstudio.com/bin/windows/contrib/4.4/e1071_1.7-16.zip'
+Content type 'application/zip' length 674480 bytes (658 KB)
+downloaded 658 KB
+
+trying URL 'https://cran.rstudio.com/bin/windows/contrib/4.4/foreach_1.5.2.zip'
+Content type 'application/zip' length 149935 bytes (146 KB)
+downloaded 146 KB
+
+trying URL 'https://cran.rstudio.com/bin/windows/contrib/4.4/ModelMetrics_1.2.2.2.zip'
+Content type 'application/zip' length 480871 bytes (469 KB)
+downloaded 469 KB
+
+trying URL 'https://cran.rstudio.com/bin/windows/contrib/4.4/plyr_1.8.9.zip'
+Content type 'application/zip' length 1113297 bytes (1.1 MB)
+downloaded 1.1 MB
+
+trying URL 'https://cran.rstudio.com/bin/windows/contrib/4.4/pROC_1.18.5.zip'
+Content type 'application/zip' length 1168458 bytes (1.1 MB)
+downloaded 1.1 MB
+
+trying URL 'https://cran.rstudio.com/bin/windows/contrib/4.4/recipes_1.1.1.zip'
+Content type 'application/zip' length 1698811 bytes (1.6 MB)
+downloaded 1.6 MB
+
+trying URL 'https://cran.rstudio.com/bin/windows/contrib/4.4/reshape2_1.4.4.zip'
+Content type 'application/zip' length 442553 bytes (432 KB)
+downloaded 432 KB
+
+trying URL 'https://cran.rstudio.com/bin/windows/contrib/4.4/caret_7.0-1.zip'
+Content type 'application/zip' length 3603174 bytes (3.4 MB)
+downloaded 3.4 MB
+
+package ‘listenv’ successfully unpacked and MD5 sums checked
+package ‘parallelly’ successfully unpacked and MD5 sums checked
+package ‘future’ successfully unpacked and MD5 sums checked
+package ‘globals’ successfully unpacked and MD5 sums checked
+package ‘shape’ successfully unpacked and MD5 sums checked
+package ‘future.apply’ successfully unpacked and MD5 sums checked
+package ‘progressr’ successfully unpacked and MD5 sums checked
+package ‘SQUAREM’ successfully unpacked and MD5 sums checked
+package ‘cpp11’ successfully unpacked and MD5 sums checked
+package ‘diagram’ successfully unpacked and MD5 sums checked
+package ‘lava’ successfully unpacked and MD5 sums checked
+package ‘tzdb’ successfully unpacked and MD5 sums checked
+package ‘prodlim’ successfully unpacked and MD5 sums checked
+package ‘timechange’ successfully unpacked and MD5 sums checked
+package ‘proxy’ successfully unpacked and MD5 sums checked
+package ‘iterators’ successfully unpacked and MD5 sums checked
+package ‘data.table’ successfully unpacked and MD5 sums checked
+package ‘clock’ successfully unpacked and MD5 sums checked
+package ‘gower’ successfully unpacked and MD5 sums checked
+package ‘hardhat’ successfully unpacked and MD5 sums checked
+package ‘ipred’ successfully unpacked and MD5 sums checked
+package ‘lubridate’ successfully unpacked and MD5 sums checked
+package ‘sparsevctrs’ successfully unpacked and MD5 sums checked
+package ‘e1071’ successfully unpacked and MD5 sums checked
+package ‘foreach’ successfully unpacked and MD5 sums checked
+package ‘ModelMetrics’ successfully unpacked and MD5 sums checked
+package ‘plyr’ successfully unpacked and MD5 sums checked
+package ‘pROC’ successfully unpacked and MD5 sums checked
+package ‘recipes’ successfully unpacked and MD5 sums checked
+package ‘reshape2’ successfully unpacked and MD5 sums checked
+package ‘caret’ successfully unpacked and MD5 sums checked
+
+The downloaded binary packages are in
+	C:\Users\omsth\AppData\Local\Temp\RtmpmKKSqL\downloaded_packages
+> library(caret)
+Loading required package: ggplot2
+Loading required package: lattice
+Warning message:
+package ‘caret’ was built under R version 4.4.3 
+> 
+> dummy_vars <- dummyVars(~ height_category + weight_category, data = women_cat)
+> women_transformed <- predict(dummy_vars, newdata = women_cat)
+> 
+> women_encoded <- cbind(women_cat[, c("height", "weight")], as.data.frame(women_transformed))
+> 
+> print(women_encoded)
+   height weight height_category.short height_category.medium height_category.tall weight_category.thin
+1      58    115                     1                      0                    0                    1
+2      59    117                     1                      0                    0                    1
+3      60    120                     1                      0                    0                    1
+4      61    123                     1                      0                    0                    1
+5      62    126                     1                      0                    0                    0
+6      63    129                     0                      1                    0                    0
+7      64    132                     0                      1                    0                    0
+8      65    135                     0                      1                    0                    0
+9      66    139                     0                      1                    0                    0
+10     67    142                     0                      0                    1                    0
+11     68    146                     0                      0                    1                    0
+12     69    150                     0                      0                    1                    0
+13     70    154                     0                      0                    1                    0
+14     71    159                     0                      0                    1                    0
+15     72    164                     0                      0                    1                    0
+   weight_category.medium weight_category.fat
+1                       0                   0
+2                       0                   0
+3                       0                   0
+4                       0                   0
+5                       1                   0
+6                       1                   0
+7                       1                   0
+8                       1                   0
+9                       1                   0
+10                      0                   1
+11                      0                   1
+12                      0                   1
+13                      0                   1
+14                      0                   1
+15                      0                   1
+> print(women_encoded)
+   height weight height_category.short height_category.medium height_category.tall weight_category.thin weight_category.medium weight_category.fat
+1      58    115                     1                      0                    0                    1                      0                   0
+2      59    117                     1                      0                    0                    1                      0                   0
+3      60    120                     1                      0                    0                    1                      0                   0
+4      61    123                     1                      0                    0                    1                      0                   0
+5      62    126                     1                      0                    0                    0                      1                   0
+6      63    129                     0                      1                    0                    0                      1                   0
+7      64    132                     0                      1                    0                    0                      1                   0
+8      65    135                     0                      1                    0                    0                      1                   0
+9      66    139                     0                      1                    0                    0                      1                   0
+10     67    142                     0                      0                    1                    0                      0                   1
+11     68    146                     0                      0                    1                    0                      0                   1
+12     69    150                     0                      0                    1                    0                      0                   1
+13     70    154                     0                      0                    1                    0                      0                   1
+14     71    159                     0                      0                    1                    0                      0                   1
+15     72    164                     0                      0                    1                    0                      0                   1
+> min_max_scale <- function(x) {
++     (x - min(x)) / (max(x) - min(x))
++ }
+> women_minmax <- women
+> women_minmax$height <- min_max_scale(women$height)
+> women_minmax$weight <- min_max_scale(women$weight)
+> print(women_minmax)
+       height     weight
+1  0.00000000 0.00000000
+2  0.07142857 0.04081633
+3  0.14285714 0.10204082
+4  0.21428571 0.16326531
+5  0.28571429 0.22448980
+6  0.35714286 0.28571429
+7  0.42857143 0.34693878
+8  0.50000000 0.40816327
+9  0.57142857 0.48979592
+10 0.64285714 0.55102041
+11 0.71428571 0.63265306
+12 0.78571429 0.71428571
+13 0.85714286 0.79591837
+14 0.92857143 0.89795918
+15 1.00000000 1.00000000
