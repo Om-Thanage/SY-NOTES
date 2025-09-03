@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Name: Om Thanage</h1>
+    <h1>Roll No: 16010123217</h1>
+
+    <div style="display: flex; gap: 4rem; align-items: center; justify-content: space-between; width: 50vw;">
+        <h1>A)</h1>
+        <h1>Display Date</h1>
+        <p id="date"></p>
+        <button style="padding: 12px;" onclick="displayDate()">Get Date</button>
+    </div>
+
+    <div style="display: flex; gap: 4rem; align-items: center;  justify-content: space-between; width: 50vw;">
+        <h1>B)</h1>
+        <h1>Factorial</h1>
+        <button style="padding: 12px;" onclick="getFactorial()">Get Factorial</button>
+    </div>
+
+
+    <div style="display: flex; gap: 4rem; align-items: center;  justify-content: space-between; width: 50vw;">
+        <h1>C)</h1>
+        <h1>Multiplication Table</h1>
+        <button style="padding: 12px;" onclick="getTable()">Get Table</button>
+    </div>
+    <div style="width: 50vw; margin-top: 2rem;" id="table"></div>
+        
+    </div>
+
+
+
+    <script>
+        function displayDate() {
+            let date = new Date();
+            document.getElementById("date").innerHTML = date;
+        }
+
+        function getFactorial() {
+            let num = prompt("Enter a number: ");
+            let factorial = 1;
+            for (let i = 1; i <= num; i++) {
+                factorial *= i;
+            }
+            alert(`Factorial of ${num} is ${factorial}`);
+        }
+
+        function getTable() {
+            let num = prompt("Enter a number: ");
+            let table = "";
+            for (let i = 1; i <= 10; i++) {
+                table += `${num} x ${i} = ${num * i}<br>`;
+            }
+            document.getElementById("table").innerHTML = table;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Registration Form</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    form {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.1);
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+    }
+    input[type="text"], input[type="password"], input[type="email"], input[type="number"] {
+      width: 90%;
+      padding: 8px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    input[type="submit"] {
+      margin-top: 15px;
+      background: #5cb85c;
+      color: white;
+      border: none;
+      padding: 10px;
+      cursor: pointer;
+      width: 100%;
+      border-radius: 4px;
+    }
+    input[type="submit"]:hover {
+      background: #4cae4c;
+    }
+  </style>
+</head>
+<body>
+  <form>
+    <label for="name">Name:</label>
+    <input type="text" id="name" name="name"
+           title="Name should contain only alphabets and be at least 6 characters long" />
+    <br>
+
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password"
+           minlength="6" required
+           title="Password should be at least 6 characters long" />
+    <br>
+
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email"
+           pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" required
+           title="Enter a valid email address (e.g., user@domain.com)" />
+    <br>
+
+    <label for="phone">Phone:</label>
+    <input type="number" id="phone" name="phone"
+           pattern="[0-9]{10}" required
+           title="Phone number should contain exactly 10 digits" />
+    <br>
+
+    <input type="submit" value="Register">
+  </form>
+</body>
+</html>
